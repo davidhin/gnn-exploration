@@ -1,4 +1,6 @@
 """Set up project paths."""
+import inspect
+from datetime import datetime
 from pathlib import Path
 
 
@@ -46,5 +48,11 @@ def get_dir(path) -> Path:
     return path
 
 
-# https://stackoverflow.com/a/50194143/1889006
-# https://stackoverflow.com/a/53465812/1889006
+def debug(msg, sep="\t"):
+    """Print to console with debug information."""
+    caller = inspect.stack()[1]
+    file_name = caller.filename
+    ln = caller.lineno
+    now = datetime.now()
+    time = now.strftime("%m/%d/%Y - %H:%M:%S")
+    print('[{}] File "{}", line {}\n\t{}'.format(time, file_name, ln, msg))

@@ -22,4 +22,13 @@ else
     echo "Already downloaded BGNN4VD dataset"
 fi
 
+if [[ ! -d "reveal_chrome_debian" ]]; then
+    gdown https://drive.google.com/uc\?id\=1cU1KZnY0EnUtHdTjdm3B6guGY5R8EzM9
+    unzip data.zip
+    rm -rf data.zip
+else
+    echo "Already downloaded ReVeal data"
+fi
+
+
 cd ..
