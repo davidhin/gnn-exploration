@@ -30,5 +30,12 @@ else
     echo "Already downloaded ReVeal data"
 fi
 
+if [[ ! -d "w2v_models" ]]; then
+    gdown https://drive.google.com/uc\?id\=1_vYrun3m1EUErTWwy3QiOmsiC3vyqgZa
+    unzip w2v_models.zip
+    rm -rf w2v_models.zip
+else
+    echo "Already downloaded w2v_models"
+fi
 
 cd ..
