@@ -19,6 +19,7 @@ From:ufoym/deepo:pytorch-cu102
     apt update
     apt install -y build-essential
     pip install -r /requirements.txt
+    python -c 'import nltk; nltk.download("punkt")'
 
     # Install Joern
     apt install -y openjdk-8-jdk git curl gnupg bash unzip sudo wget 
