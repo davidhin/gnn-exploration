@@ -21,7 +21,7 @@ savedir = gp.processed_dir() / "devign_ffmpeg_qemu"
 def process_split(split: list):
     """Run joern on list of files sequentially."""
     for f in split:
-        done = [Path(i).stem for i in glob(savedir / "*")]
+        done = [Path(i).stem for i in glob(str(savedir / "*"))]
         if Path(f).stem in done:
             gp.debug("Finished, skipping {}".format(Path(f).stem))
             continue

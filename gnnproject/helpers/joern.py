@@ -39,26 +39,34 @@ def run_joern(
     joern_parse = joern_parse.split()
     joern_export = joern_export.split()
 
-    subprocess.run(
-        joern_parse
-        + [
-            "--out={}.bin".format(savepath_interim / filename),
-            filepath,
-        ],
-    )
+    while True:
+        try:
+            subprocess.run(
+                joern_parse
+                + [
+                    "--out={}.bin".format(savepath_interim / filename),
+                    filepath,
+                ],
+            )
 
-    subprocess.run(
-        joern_export
-        + [
-            "--repr=cpg14",
-            savepath_interim / "{}.bin".format(filename),
-            "--out={}".format(savepath_interim / filename),
-        ],
-    )
+            subprocess.run(
+                joern_export
+                + [
+                    "--repr=cpg14",
+                    savepath_interim / "{}.bin".format(filename),
+                    "--out={}".format(savepath_interim / filename),
+                ],
+            )
 
-    # Read first CPG : I think this is the main CPG, and the others are for func calls
-    with open(savepath_interim / filename / "0-cpg.dot") as f:
-        joern_output = f.read()
+            # Read first CPG : I think this is the main CPG, and the others are for func calls
+            with open(savepath_interim / filename / "0-cpg.dot") as f:
+                joern_output = f.read()
+        except Exception as E:
+            gp.debug(E)
+            os.remove(savepath_interim / "{}.bin".format(filename))
+            shutil.rmtree(savepath_interim / filename)
+        else:
+            break
 
     # Delete interim files
     os.remove(savepath_interim / "{}.bin".format(filename))
