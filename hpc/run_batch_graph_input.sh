@@ -1,0 +1,17 @@
+#!/bin/bash
+#SBATCH -p batch
+#SBATCH -N 1
+#SBATCH -n 1
+#SBATCH --time=00:20:00
+#SBATCH --mem=4GB
+#SBATCH --array=1-200
+#SBATCH --err="hpc/logs/batch_gi_%a.err"
+#SBATCH --output="hpc/logs/batch_gi_%a.out"
+#SBATCH --job-name="batch_gi"
+
+# Setup Python Environment
+module load Singularity
+module load CUDA/10.2.89
+
+# Start singularity instance
+singularity run main.simg -p gnnproject/analysis/run_batch_graph_input.py -a $SLURM_ARRAY_TASK_ID

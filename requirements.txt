@@ -22,3 +22,6 @@ imbalanced-learn
 dgl
 dgl-cu102
 networkx
+pydot
+graphviz
+python-Levenshtein
