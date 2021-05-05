@@ -19,6 +19,8 @@
   },
   "editor.rulers": [88],
   "python.linting.flake8Args": [
-    "--max-line-length=88 --ignore=H306,E265,W503,D100,H301,E203,E501,E722"
-  ]
+    "--max-line-length=88",
+    "--ignore=H306,E265,W503,D100,H301,E203,E501,E722"
+  ],
+  "editor.selectionClipboard": false
 }
