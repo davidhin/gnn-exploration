@@ -20,3 +20,5 @@ torchtext
 torchsummary
 imbalanced-learn
 dgl
+dgl-cu102
+networkx
