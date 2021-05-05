@@ -14,4 +14,4 @@ module load Singularity
 module load CUDA/10.2.89
 
 # Start singularity instance
-singularity run --nv main.simg -p gnnproject/analysis/run_batch_joern.py -a $SLURM_ARRAY_TASK_ID
+singularity run main.simg -p gnnproject/analysis/run_batch_joern.py -a $SLURM_ARRAY_TASK_ID
