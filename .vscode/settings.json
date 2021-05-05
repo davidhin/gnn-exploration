@@ -1,5 +1,5 @@
 {
-  "jupyter.jupyterServerType": "remote",
+  "jupyter.jupyterServerType": "local",
   "files.exclude": {
     ".pytest_cache": true,
     "**/*.egg-info": true,
@@ -8,5 +8,14 @@
     "**/*.simg": true,
     "**/*.sif": true
   },
-  "python.pythonPath": "/home/david/miniconda3/envs/singularity-simple/bin/python"
+  "python.pythonPath": "/home/david/miniconda3/bin/python",
+  "python.formatting.provider": "black",
+  "python.linting.flake8Enabled": true,
+  "python.linting.enabled": true,
+  "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
+  "editor.rulers": [88]
 }
