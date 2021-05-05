@@ -1,4 +1,4 @@
-# %%
+# %% LOAD IMPORTS
 import sys
 from glob import glob
 from pathlib import Path
@@ -11,19 +11,17 @@ import numpy as np
 NUM_JOBS = 200
 JOB_ARRAY_NUMBER = int(sys.argv[1]) - 1
 
-# %% devign_ffmpeg_qemu
+# %% MAKE SPLITS
 files = glob(str(gp.external_dir() / "devign_ffmpeg_qemu/functions/*"))
 splits = np.array_split(files, NUM_JOBS)
+savedir = gp.processed_dir() / "devign_ffmpeg_qemu"
 
 
-# %% Download Script
-def download_split(input_files: list):
+# %% PROCESS SPLIT
+def process_split(split: list):
     """Run joern on list of files sequentially."""
-    for f in input_files:
-        print(f)
-        done = [
-            Path(i).stem for i in glob(str(gp.processed_dir() / "devign_ffmpeg_qemu/*"))
-        ]
+    for f in split:
+        done = [Path(i).stem for i in glob(savedir / "*")]
         if Path(f).stem in done:
             gp.debug("Finished, skipping {}".format(Path(f).stem))
             continue
@@ -38,4 +36,4 @@ def download_split(input_files: list):
         )
 
 
-download_split(splits[JOB_ARRAY_NUMBER])
+process_split(splits[JOB_ARRAY_NUMBER])
