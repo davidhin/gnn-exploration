@@ -40,6 +40,10 @@ def dot_to_node_edges(filepath: str) -> pd.DataFrame:
 def get_gnn_input(filepath: str) -> dict:
     """Process a dot file so that it is suitable for input into a GNN.
 
+    -----------------------------------------------------------------------
+    NOT IN USE - SWITCHED TO OLD JOERN FOR CONSISTENCY WITH PREVIOUS PAPERS
+    -----------------------------------------------------------------------
+
     Example:
     processed = glob(str(gp.processed_dir() / "**/*"))
     get_gnn_input(processed[1])

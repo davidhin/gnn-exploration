@@ -14,6 +14,10 @@ def run_joern(
 ):
     """Get output of Joern-parse given filepath.
 
+    -----------------------------------------------------------------------
+    NOT IN USE - SWITCHED TO OLD JOERN FOR CONSISTENCY WITH PREVIOUS PAPERS
+    -----------------------------------------------------------------------
+
     Example:
     joern_on_file(
         filepath=gp.external_dir() / "reveal_chrome_debian/functions/0_0.c",
