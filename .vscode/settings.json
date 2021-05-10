@@ -9,6 +9,16 @@
     "**/*.sif": true,
     "**/*.dccache": true
   },
+  "files.watcherExclude": {
+    ".pytest_cache": true,
+    "**/*.egg-info": true,
+    "**/__pycache__": true,
+    "**/*.img": true,
+    "**/*.simg": true,
+    "**/*.sif": true,
+    "**/*.dccache": true,
+    "**/storage/**": true
+  },
   "python.pythonPath": "/home/david/miniconda3/bin/python",
   "python.linting.flake8Enabled": true,
   "python.linting.enabled": true,
