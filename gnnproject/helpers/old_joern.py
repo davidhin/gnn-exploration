@@ -37,7 +37,9 @@ def run_joern_old(
         save (bool): Whether to save the data to storage/processed or return the df.
     """
     filename = Path(file_in).stem
-    save_out = gp.get_dir(gp.processed_dir() / dataset / filename)
+    save_out = gp.processed_dir() / dataset / filename
+    if save:
+        gp.get_dir(save_out)
 
     if os.path.exists(save_out / "nodes.csv"):
         gp.debug(f"Already completed {filename}")
