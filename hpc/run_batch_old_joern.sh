@@ -3,7 +3,7 @@
 #SBATCH -N 1
 #SBATCH -n 1
 #SBATCH --time=00:10:00
-#SBATCH --mem=2GB
+#SBATCH --mem=4GB
 #SBATCH --array=1-200
 #SBATCH --err="hpc/logs/batch_joern_%a.err"
 #SBATCH --output="hpc/logs/batch_joern_%a.out"
