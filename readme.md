@@ -31,5 +31,5 @@ singularity exec main.simg python gnnproject/../..
 ## Sync data from remote to local with RSync
 
 ```sh
-rsync -r a1720858@phoenix-login1.adelaide.edu.au:/hpcfs/users/a1720858/singularity/singularity-gnn-project/storage/processed /home/david/Documents/projects/singularity-gnn-project/storage
+rsync -rvP a1720858@phoenix-login1.adelaide.edu.au:/hpcfs/users/a1720858/singularity/singularity-gnn-project/storage/processed /home/david/Documents/projects/singularity-gnn-project/storage
 ```
