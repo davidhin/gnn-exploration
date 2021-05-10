@@ -6,7 +6,8 @@
     "**/__pycache__": true,
     "**/*.img": true,
     "**/*.simg": true,
-    "**/*.sif": true
+    "**/*.sif": true,
+    "**/*.dccache": true
   },
   "python.pythonPath": "/home/david/miniconda3/bin/python",
   "python.linting.flake8Enabled": true,

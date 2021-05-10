@@ -7,3 +7,4 @@ storage
 output
 .vscode/sftp.json
 hpc/logs/*
+.dccache
