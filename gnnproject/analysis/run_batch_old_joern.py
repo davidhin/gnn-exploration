@@ -9,11 +9,12 @@ import numpy as np
 # %% SETUP
 NUM_JOBS = 200
 JOB_ARRAY_NUMBER = int(sys.argv[1]) - 1
+DATASET = "devign_ffmpeg_qemu"  # Change to other datasets
 
 # %% MAKE SPLITS
-files = glob(str(gp.external_dir() / "devign_ffmpeg_qemu/functions/*"))
+files = glob(str(gp.external_dir() / f"{DATASET}/functions/*"))
 splits = np.array_split(files, NUM_JOBS)
-savedir = gp.processed_dir() / "devign_ffmpeg_qemu"
+savedir = gp.processed_dir() / DATASET
 
 
 # %% PROCESS SPLIT
@@ -22,7 +23,7 @@ def process_split(split: list):
     for f in split:
         gpj.run_joern_old(
             f,
-            "devign_ffmpeg_qemu",
+            DATASET,
             "old-joern-parse",
             save=True,
             verbose=1,
