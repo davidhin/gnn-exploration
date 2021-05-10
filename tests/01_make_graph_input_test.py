@@ -1,14 +1,24 @@
 # %%
+import os
 from glob import glob
 
 import gnnproject as gp
+import gnnproject.helpers.joern as gpj
 import gnnproject.helpers.make_graph_input as gpgi
 import numpy as np
 
 
 def test_dot_to_json():
     """Test dot_to_json returns a valid json output."""
-    processed = glob(str(gp.processed_dir() / "**/*"))
+    gpj.run_joern(
+        filepath=gp.external_dir()
+        / "devign_ffmpeg_qemu/functions/1_FFmpeg_973b1a6b9070e2bf17d17568cbaf4043ce931f51_0.c",
+        dataset_name="devign_ffmpeg_qemu",
+        save=True,
+        joern_parse="joern-parse",
+        joern_export="joern-export",
+    )
+    processed = glob(str(gp.processed_dir() / "**/*.dot"))
     out = gpgi.dot_to_json(processed[0])
     assert type(out) is dict
     assert "graph" in out.keys()
@@ -17,7 +27,7 @@ def test_dot_to_json():
 
 def test_dot_to_node_edges():
     """Test dot to node edges returns valid dataframes."""
-    processed = glob(str(gp.processed_dir() / "**/*"))
+    processed = glob(str(gp.processed_dir() / "**/*.dot"))
     out = gpgi.dot_to_node_edges(processed[0])
     assert len(out) == 2, "{} : Dot to node edges should return two dataframes".format(
         len(out)
@@ -35,8 +45,8 @@ def test_dot_to_node_edges():
 
 def test_get_gnn_input():
     """Test output of get_gnn_input is valid."""
-    processed = glob(str(gp.processed_dir() / "**/*"))
-    out = gpgi.get_gnn_input(processed[1])
+    processed = glob(str(gp.processed_dir() / "**/*.dot"))
+    out = gpgi.get_gnn_input(processed[0])
     assert list(out.keys()) == [
         "graph",
         "features",
@@ -55,3 +65,7 @@ def test_get_gnn_input():
     assert all(
         [type(i) == np.ndarray for i in out["features"]]
     ), "All features should be np.ndarray"
+    os.remove(
+        gp.processed_dir()
+        / "devign_ffmpeg_qemu/1_FFmpeg_973b1a6b9070e2bf17d17568cbaf4043ce931f51_0.dot"
+    )
