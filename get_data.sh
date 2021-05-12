@@ -23,11 +23,19 @@ else
 fi
 
 if [[ ! -d "reveal_chrome_debian" ]]; then
-    gdown https://drive.google.com/uc\?id\=1cU1KZnY0EnUtHdTjdm3B6guGY5R8EzM9
-    unzip data.zip
-    rm -rf data.zip
+    gdown https://drive.google.com/uc\?id\=12CqPX5XdT0vKx4PWL2EKdGQbGrleKgJ-
+    unzip reveal_chrome_debian.zip
+    rm -rf reveal_chrome_debian.zip
 else
     echo "Already downloaded ReVeal data"
+fi
+
+if [[ ! -d "devign_ffmpeg_qemu" ]]; then
+    gdown https://drive.google.com/uc\?id\=1le__vMWFgsbPD_dWpwae5Ydu7EWwgYeu
+    unzip devign_ffmpeg_qemu.zip
+    rm -rf devign_ffmpeg_qemu.zip
+else
+    echo "Already downloaded Devign data"
 fi
 
 if [[ ! -d "w2v_models" ]]; then
