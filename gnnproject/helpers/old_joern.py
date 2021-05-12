@@ -16,10 +16,21 @@ def subprocess_cmd(command: str, verbose: int = 0):
     >>> a
     >>> b
     """
-    process = subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
-    )
-    output = process.communicate()
+    while True:
+        process = subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+        )
+        output = process.communicate()
+        if "old-joern-parse: not found" in output[1].decode():
+            command = command.replace(
+                "old-joern-parse",
+                f"singularity exec {gp.project_dir()}/main.simg old-joern-parse",
+            )
+            if verbose > 2:
+                gp.debug("ERROR: old-joern-parse not in path. Running from image...")
+                gp.debug(command)
+        else:
+            break
     if verbose > 1:
         gp.debug(output[0].decode())
         gp.debug(output[1].decode())
