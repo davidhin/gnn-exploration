@@ -25,3 +25,4 @@ networkx
 pydot
 graphviz
 python-Levenshtein
+tensorboard
