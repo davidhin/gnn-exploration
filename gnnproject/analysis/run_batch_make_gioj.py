@@ -24,12 +24,15 @@ JOB_ARRAY_NUMBER = int(sys.argv[1]) - 1
 if JOB_ARRAY_NUMBER == 0:
     vari = "cfgdfg"
     etm = EDGE_TYPES
+    cfgonly = False
 if JOB_ARRAY_NUMBER == 1:
     vari = "cfg"
     etm = EDGE_TYPES_CD
+    cfgonly = True
 if JOB_ARRAY_NUMBER == 2:
     vari = "cpg"
     etm = EDGE_TYPES
+    cfgonly = False
 
 # %% MAKE SPLITS
 files = sorted(glob(str(gp.external_dir() / f"{DATASET}/functions/*")))
@@ -45,7 +48,7 @@ def process_split(split: list):
         if os.path.exists(savedir / str(f"{filename}.pkl")):
             continue
         path = gp.processed_dir() / DATASET / filename
-        g = ggi.cpg_to_dgl_from_filepath(path, etm)
+        g = ggi.cpg_to_dgl_from_filepath(path, cfgonly=cfgonly, etypemap=etm)
         if not g:
             continue
 
