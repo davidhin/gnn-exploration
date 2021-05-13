@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import pygraphviz as pgv
 import torch
-from gnnproject.helpers.constants import EDGE_TYPES
+from gnnproject.helpers.constants import EDGE_TYPES, TYPE_MAP, TYPE_MAP_OH
 from IPython.display import Image, display
 
 
@@ -107,8 +107,18 @@ def cpg_to_dgl_from_filepath(
     src = e["start"].to_numpy()
     dst = e["end"].to_numpy()
     nnodes = len(n)
+
+    def one_hot_encode_type(node_type):
+        try:
+            return TYPE_MAP_OH[TYPE_MAP[node_type] - 1].tolist()
+        except:
+            return -1
+
     n.code = n.code.fillna("")
-    nfeat = torch.tensor(n.code.apply(embed_code, w2v=w2v).to_list()).float()
+    n.code = n.code.apply(embed_code, w2v=w2v).to_list()
+    n.type = n.type.apply(one_hot_encode_type)
+    n = n[n.type != -1]
+    nfeat = torch.tensor([list(i.type) + list(i.code) for i in n.itertuples()]).float()
     etype = torch.tensor([etypemap[i] for i in e.type])
 
     try:
