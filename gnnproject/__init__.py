@@ -55,4 +55,8 @@ def debug(msg, sep="\t"):
     ln = caller.lineno
     now = datetime.now()
     time = now.strftime("%m/%d/%Y - %H:%M:%S")
-    print('[{}] File "{}", line {}\n\t{}'.format(time, file_name, ln, msg))
+    print(
+        '\x1b[40m[{}] File "{}", line {}\x1b[0m\n\t\x1b[94m{}\x1b[0m'.format(
+            time, file_name, ln, msg
+        )
+    )
