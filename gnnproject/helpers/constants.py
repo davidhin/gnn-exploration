@@ -16,6 +16,13 @@ EDGE_TYPES = {
     "USE": 12,
 }
 
+EDGE_TYPES_CD = {
+    "DEF": 0,
+    "USE": 1,
+    "REACHES": 2,
+    "FLOWS_TO": 3,  # Control Flow
+    "CONTROLS": 4,  # Control Dependency edge
+}
 
 TYPE_MAP = {
     "AndExpression": 1,
