@@ -6,6 +6,7 @@ with the edge connections, initial vertice features (W2V), and edge types.
 # %%
 import os
 import pickle as pkl
+import sys
 from glob import glob
 from multiprocessing.pool import Pool
 from pathlib import Path
@@ -13,12 +14,22 @@ from pathlib import Path
 import gnnproject as gp
 import gnnproject.helpers.make_graph_input_oj as ggi
 import numpy as np
-from gnnproject.helpers.constants import EDGE_TYPES
+from gnnproject.helpers.constants import EDGE_TYPES, EDGE_TYPES_CD
 from tqdm import tqdm
 
 # %% SETUP
 DATASET = "devign_ffmpeg_qemu"  # Change to other datasets
 NUM_JOBS = 2000
+JOB_ARRAY_NUMBER = int(sys.argv[1]) - 1
+if JOB_ARRAY_NUMBER == 0:
+    vari = "cfgdfg"
+    etm = EDGE_TYPES
+if JOB_ARRAY_NUMBER == 1:
+    vari = "cfg"
+    etm = EDGE_TYPES_CD
+if JOB_ARRAY_NUMBER == 2:
+    vari = "cpg"
+    etm = EDGE_TYPES
 
 # %% MAKE SPLITS
 files = sorted(glob(str(gp.external_dir() / f"{DATASET}/functions/*")))
@@ -29,12 +40,12 @@ splits = np.array_split(files, NUM_JOBS)
 def process_split(split: list):
     """Process list of files sequentially."""
     for f in split:
-        savedir = gp.get_dir(gp.processed_dir() / f"{DATASET}_dgl")
+        savedir = gp.get_dir(gp.processed_dir() / f"{DATASET}_dgl_{vari}")
         filename = Path(f).stem
         if os.path.exists(savedir / str(f"{filename}.pkl")):
             continue
         path = gp.processed_dir() / DATASET / filename
-        g = ggi.cpg_to_dgl_from_filepath(path, EDGE_TYPES)
+        g = ggi.cpg_to_dgl_from_filepath(path, etm)
         if not g:
             continue
 
@@ -52,7 +63,7 @@ def process_split(split: list):
 
 
 # %% RUN IN PARALLEL LOCALLY
-with Pool(6) as p:
+with Pool(4) as p:
     with tqdm(total=NUM_JOBS) as pbar:
         for _ in p.imap_unordered(process_split, splits):
             pbar.update()
