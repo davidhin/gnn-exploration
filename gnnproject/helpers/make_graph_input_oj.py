@@ -143,7 +143,7 @@ def cpg_to_dgl_from_filepath(
     dst = e["end"].to_numpy()
     nnodes = len(n)
     nfeat = torch.tensor([list(i.type) + list(i.code) for i in n.itertuples()]).float()
-    etype = torch.tensor([etypemap[i] for i in e.type])
+    etype = torch.tensor([etypemap[i] for i in e.type]).int()
 
     try:
         label = int(label)
