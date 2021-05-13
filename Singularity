@@ -20,7 +20,10 @@ From:pytorch/pytorch:1.6.0-cuda10.1-cudnn7-runtime
 
     # Update
     apt update
-    apt install -y wget build-essential git
+    apt install -y software-properties-common
+    add-apt-repository universe
+    apt update
+    apt install -y wget build-essential git graphviz python-dev python3-dev
 
     # Install miniconda
     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
@@ -28,10 +31,11 @@ From:pytorch/pytorch:1.6.0-cuda10.1-cudnn7-runtime
 
     # Install python dependencies here
     pip install -r /requirements.txt
+    conda install -y pygraphviz
     python -c 'import nltk; nltk.download("punkt")'
 
     # Install Java build dependencies
-    apt install -y gradle graphviz-dev
+    apt install -y gradle 
 
     # Install Joern Old
     git clone https://github.com/octopus-platform/joern.git
