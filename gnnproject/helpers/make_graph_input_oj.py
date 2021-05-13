@@ -79,6 +79,7 @@ def cpg_to_dgl_from_filepath(
     w2v: gensim.models.word2vec,
     etypemap: map = EDGE_TYPES,
     verbose: int = 0,
+    cfgonly: bool = False,
 ):
     """Obtain DGL graph from code property graph output from Joern (old).
 
@@ -88,7 +89,8 @@ def cpg_to_dgl_from_filepath(
     sample = "devign_ffmpeg_qemu/21396_qemu_2caa9e9d2e0f356cc244bc41ce1d3e81663f6782_1"
     filepath = gp.processed_dir() / sample
     w2v = Word2Vec.load(str(gp.external_dir() / "w2v_models/devign"))
-    etypemap = EDGE_TYPES
+    etypemap = EDGE_TYPES_CD
+    cfgonly = False
     """
     try:
         nodes = pd.read_csv(filepath / "nodes.csv", sep="\t")
@@ -104,9 +106,9 @@ def cpg_to_dgl_from_filepath(
     label = str(filepath).split("_")[-1]
     n, e = format_node_edges(nodes, edges)
     e = e[e.type != "IS_FILE_OF"]
-    src = e["start"].to_numpy()
-    dst = e["end"].to_numpy()
-    nnodes = len(n)
+
+    # Filter edge types
+    e = e[e.type.isin(etypemap)]
 
     def one_hot_encode_type(node_type):
         try:
@@ -114,10 +116,32 @@ def cpg_to_dgl_from_filepath(
         except:
             return -1
 
+    if cfgonly:  # TODO Double check the ID mapping
+        n.isCFGNode = n.isCFGNode.fillna(False)
+        n = n[n.isCFGNode].copy()
+
+    # Reset ID mappings
+    node_id_dict = (
+        n.reset_index(drop=True)
+        .reset_index()[["key", "index"]]
+        .set_index("key")
+        .to_dict()["index"]
+    )
+    e = e[(e.start.isin(n.key)) & (e.end.isin(n.key))].copy()
+    n.key = n.key.apply(lambda x: node_id_dict[x])
+    e.start = e.start.apply(lambda x: node_id_dict[x])
+    e.end = e.end.apply(lambda x: node_id_dict[x])
+
+    # Embed features
     n.code = n.code.fillna("")
     n.code = n.code.apply(embed_code, w2v=w2v).to_list()
     n.type = n.type.apply(one_hot_encode_type)
     n = n[n.type != -1]
+
+    # Format data appropriately
+    src = e["start"].to_numpy()
+    dst = e["end"].to_numpy()
+    nnodes = len(n)
     nfeat = torch.tensor([list(i.type) + list(i.code) for i in n.itertuples()]).float()
     etype = torch.tensor([etypemap[i] for i in e.type])
 
