@@ -14,6 +14,7 @@ from pathlib import Path
 import gnnproject as gp
 import gnnproject.helpers.make_graph_input_oj as ggi
 import numpy as np
+from gensim.models import Word2Vec
 from gnnproject.helpers.constants import EDGE_TYPES, EDGE_TYPES_CD
 from tqdm import tqdm
 
@@ -37,6 +38,7 @@ if JOB_ARRAY_NUMBER == 2:
 # %% MAKE SPLITS
 files = sorted(glob(str(gp.external_dir() / f"{DATASET}/functions/*")))
 splits = np.array_split(files, NUM_JOBS)
+w2v = Word2Vec.load(str(gp.external_dir() / "w2v_models/devign"))
 
 
 # %% PROCESS SPLIT
@@ -48,7 +50,7 @@ def process_split(split: list):
         if os.path.exists(savedir / str(f"{filename}.pkl")):
             continue
         path = gp.processed_dir() / DATASET / filename
-        g = ggi.cpg_to_dgl_from_filepath(path, cfgonly=cfgonly, etypemap=etm)
+        g = ggi.cpg_to_dgl_from_filepath(path, w2v=w2v, cfgonly=cfgonly, etypemap=etm)
         if not g:
             continue
 
