@@ -102,8 +102,8 @@ class BasicGGNN(nn.Module):
     def forward(self, g):
         """Forward pass."""
         h = self.ggnn(g, g.ndata["_FEAT"], g.edata["_TYPE"])
-        g.ndata["_FEAT"] = h
-        hg = dgl.mean_nodes(g, "_FEAT")
+        g.ndata["h"] = h
+        hg = dgl.sum_nodes(g, "h")
         return self.classify(hg)
 
 
