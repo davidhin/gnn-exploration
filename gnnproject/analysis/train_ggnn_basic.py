@@ -99,7 +99,7 @@ for epoch in range(500):
         patience += 1
         gp.debug(f"No improvement. Patience: {patience}")
 
-    if patience > 100:
+    if patience > 50:
         gp.debug("Training Complete.")
         break
 
