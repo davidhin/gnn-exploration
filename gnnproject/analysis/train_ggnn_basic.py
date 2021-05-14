@@ -21,10 +21,11 @@ BATCH_SIZE = 64
 LEARN_RATE = 0.0001
 IN_NUM = 169
 OUT_NUM = 200
+SPLIT_SEED = 0
 
 # %% Load own feature extracted graphs
 dgl_proc_files = glob(str(gp.processed_dir() / f"{DATASET}_dgl_{VARIATION}/*"))
-train, val, test = dglh.train_val_test(dgl_proc_files)
+train, val, test = dglh.train_val_test(dgl_proc_files, seed=SPLIT_SEED)
 print(len(train), len(val), len(test))
 trainset = dglh.CustomGraphDataset(train)
 valset = dglh.CustomGraphDataset(val)

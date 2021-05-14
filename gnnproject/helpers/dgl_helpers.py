@@ -127,10 +127,14 @@ def plot_graph(input_graph):
     plt.show()
 
 
-def train_val_test(ilist: list, train_ratio=0.75, val_ratio=0.15, test_ratio=0.10):
+def train_val_test(
+    ilist: list, train_ratio=0.75, val_ratio=0.15, test_ratio=0.10, seed=0
+):
     """Split into train/val/test."""
-    train, test = train_test_split(ilist, test_size=1 - train_ratio)
-    val, test = train_test_split(test, test_size=test_ratio / (test_ratio + val_ratio))
+    train, test = train_test_split(ilist, test_size=1 - train_ratio, random_state=seed)
+    val, test = train_test_split(
+        test, test_size=test_ratio / (test_ratio + val_ratio), random_state=seed
+    )
     return train, val, test
 
 
