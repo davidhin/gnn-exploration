@@ -121,7 +121,7 @@ def get_intermediate(model, data_loader):
         input[0].ndata["features"] = output
         unbatched_g = dgl.unbatch(input[0])
         graph_reps = [
-            dgl.mean_nodes(g, "features").detach().cpu().numpy() for g in unbatched_g
+            dgl.sum_nodes(g, "features").detach().cpu().numpy() for g in unbatched_g
         ]
         rep.append(graph_reps)
 
