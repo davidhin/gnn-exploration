@@ -111,41 +111,13 @@ gp.debug(dglh.eval_model(model, val_loader))
 gp.debug(dglh.eval_model(model, test_loader))
 
 # %% Get and save intermediate representations
-
-
-def get_intermediate(model, data_loader):
-    """Get second to last layer output of DL model."""
-    rep = []
-    labels = []
-
-    def hook(module, input, output):
-        input[0].ndata["features"] = output
-        unbatched_g = dgl.unbatch(input[0])
-        graph_reps = [
-            dgl.sum_nodes(g, "features").detach().cpu().numpy() for g in unbatched_g
-        ]
-        rep.append(graph_reps)
-
-    handle = model.ggnn.register_forward_hook(hook)
-    model.eval()
-    with torch.no_grad():
-        with tqdm(data_loader) as tepoch:
-            for bg, label in tepoch:
-                model(bg)
-                labels += label.detach().cpu().tolist()
-
-    handle.remove()
-    rep = [i for j in rep for i in j]
-    return list(zip(rep, labels))
-
-
 dl_args = {"batch_size": 128, "shuffle": False, "collate_fn": dglh.collate}
 train_loader = DataLoader(trainset, **dl_args)
 val_loader = DataLoader(valset, **dl_args)
 test_loader = DataLoader(testset, **dl_args)
-train_graph_rep = get_intermediate(model, train_loader)
-val_graph_rep = get_intermediate(model, val_loader)
-test_graph_rep = get_intermediate(model, test_loader)
+train_graph_rep = dglh.get_intermediate(model, train_loader)
+val_graph_rep = dglh.get_intermediate(model, val_loader)
+test_graph_rep = dglh.get_intermediate(model, test_loader)
 
 
 with open(

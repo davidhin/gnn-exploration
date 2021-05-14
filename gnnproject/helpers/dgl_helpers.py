@@ -162,3 +162,29 @@ def eval_model(model: nn.Module, data_loader: DataLoader):
         gp.debug(eval_str)
     model.train()
     return ret
+
+
+def get_intermediate(model, data_loader):
+    """Get second to last layer output of DL model."""
+    rep = []
+    labels = []
+
+    def hook(module, input, output):
+        input[0].ndata["features"] = output
+        unbatched_g = dgl.unbatch(input[0])
+        graph_reps = [
+            dgl.sum_nodes(g, "features").detach().cpu().numpy() for g in unbatched_g
+        ]
+        rep.append(graph_reps)
+
+    handle = model.ggnn.register_forward_hook(hook)
+    model.eval()
+    with torch.no_grad():
+        with tqdm(data_loader) as tepoch:
+            for bg, label in tepoch:
+                model(bg)
+                labels += label.detach().cpu().tolist()
+
+    handle.remove()
+    rep = [i for j in rep for i in j]
+    return list(zip(rep, labels))
