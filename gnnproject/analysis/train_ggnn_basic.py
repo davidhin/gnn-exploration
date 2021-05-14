@@ -64,9 +64,7 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=args.learn_rate, weight_decay=0.001)
     savedir = gp.get_dir(gp.processed_dir() / "dl_models")
     ID = datetime.datetime.now().strftime(
-        "%Y%m%d%H%M_{}_{}_{}_{}".format(
-            args.dataset, args.variation, args.learn_rate, args.out_num
-        )
+        "%Y%m%d%H%M_{}".format("_".join([f"{v}" for k, v in vars(args).items()]))
     )
     savepath = savedir / f"best_basic_ggnn_{ID}.bin"
     model = model.to("cuda")
