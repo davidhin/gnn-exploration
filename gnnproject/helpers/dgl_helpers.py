@@ -5,6 +5,7 @@ import dgl
 import gnnproject as gp
 import matplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
 import torch
 from dgl.data import DGLDataset
 from dgl.nn import GatedGraphConv
@@ -188,3 +189,31 @@ def get_intermediate(model, data_loader):
     handle.remove()
     rep = [i for j in rep for i in j]
     return list(zip(rep, labels))
+
+
+def get_node_init_graph_features(dgl_proc_files: list, outprefix="no_ggnn", seed=0):
+    """Get graph representations using node initialisations (ie no GGNN).
+
+    EXAMPLE:
+    DATASET = "devign_ffmpeg_qemu"  # Change to other datasets
+    VARIATION = "cfgdfg"
+    dgl_proc_files = glob(str(gp.processed_dir() / f"{DATASET}_dgl_{VARIATION}/*"))
+    """
+
+    def sum_node_inits(filepath):
+        with open(filepath, "rb") as f:
+            g = pkl.load(f)
+            feat = np.sum(g[0].ndata["_FEAT"].numpy(), axis=0)
+            label = g[1]
+        return (feat, label)
+
+    train, val, test = train_val_test(dgl_proc_files, seed=seed)
+    train_noggnn = [sum_node_inits(i) for i in tqdm(train)]
+    val_noggnn = [sum_node_inits(i) for i in tqdm(val)]
+    test_noggnn = [sum_node_inits(i) for i in tqdm(test)]
+    with open(gp.processed_dir() / "dl_models" / f"{outprefix}_train.pkl", "wb") as f:
+        pkl.dump(train_noggnn, f)
+    with open(gp.processed_dir() / "dl_models" / f"{outprefix}_val.pkl", "wb") as f:
+        pkl.dump(val_noggnn, f)
+    with open(gp.processed_dir() / "dl_models" / f"{outprefix}_test.pkl", "wb") as f:
+        pkl.dump(test_noggnn, f)
