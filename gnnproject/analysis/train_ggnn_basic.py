@@ -4,7 +4,6 @@ import pickle as pkl
 from collections import Counter
 from glob import glob
 
-import dgl
 import gnnproject as gp
 import gnnproject.helpers.dgl_helpers as dglh
 import torch
