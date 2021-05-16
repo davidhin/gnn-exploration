@@ -5,6 +5,7 @@ import json
 import pickle as pkl
 from collections import Counter
 from glob import glob
+from random import randrange
 
 import gnnproject as gp
 import gnnproject.helpers.dgl_helpers as dglh
@@ -30,7 +31,7 @@ if __name__ == "__main__":
     parser.add_argument("--learn_rate", default=0.0001, type=float)
     parser.add_argument("--in_num", default=169, type=int)
     parser.add_argument("--out_num", default=200, type=int)
-    parser.add_argument("--split_seed", default=0, type=int)
+    parser.add_argument("--split_seed", default=randrange(5), type=int)
     parser.add_argument("--patience", default=30, type=int)
     try:
         args = parser.parse_args()
