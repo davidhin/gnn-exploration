@@ -167,11 +167,12 @@ if __name__ == "__main__":
             ",".join(
                 [
                     ID,
-                    json.dumps(ggnn_results_train),
-                    json.dumps(ggnn_results_val),
-                    json.dumps(ggnn_results_test),
-                    json.dumps(rlearning_results_train),
-                    json.dumps(rlearning_results_test),
+                    '"' + json.dumps(ggnn_results_train).replace('"', "'") + '"',
+                    '"' + json.dumps(ggnn_results_val).replace('"', "'") + '"',
+                    '"' + json.dumps(ggnn_results_test).replace('"', "'") + '"',
+                    '"' + json.dumps(rlearning_results_train).replace('"', "'") + '"',
+                    '"' + json.dumps(rlearning_results_test).replace('"', "'") + '"',
                 ]
             )
+            + "\n"
         )
