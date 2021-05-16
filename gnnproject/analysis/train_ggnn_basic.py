@@ -1,6 +1,7 @@
 # %% SETUP
 import argparse
 import datetime
+import json
 import pickle as pkl
 from collections import Counter
 from glob import glob
@@ -30,7 +31,7 @@ if __name__ == "__main__":
     parser.add_argument("--in_num", default=169, type=int)
     parser.add_argument("--out_num", default=200, type=int)
     parser.add_argument("--split_seed", default=0, type=int)
-    parser.add_argument("--patience", default=2, type=int)
+    parser.add_argument("--patience", default=30, type=int)
     try:
         args = parser.parse_args()
     except:
@@ -41,7 +42,6 @@ if __name__ == "__main__":
     dgl_proc_files = glob(
         str(gp.processed_dir() / f"{args.dataset}_dgl_{args.variation}/*")
     )
-    dgl_proc_files = dgl_proc_files[:1000]
     train, val, test = dglh.train_val_test(dgl_proc_files, seed=args.split_seed)
     print(len(train), len(val), len(test))
     trainset = dglh.CustomGraphDataset(train)
@@ -161,15 +161,17 @@ if __name__ == "__main__":
     )
 
     # %% Save results
-    final_savedir = gp.get_dir(gp.outputs_dir() / f"{args.dataset}_results")
-    with open(str(final_savedir) + str("/" + ID + ".pkl")) as f:
-        pkl.dump(
-            {
-                "ggnn_results_train": ggnn_results_train,
-                "ggnn_results_val": ggnn_results_val,
-                "ggnn_results_test": ggnn_results_test,
-                "rlearning_results_train": rlearning_results_train,
-                "rlearning_results_test": rlearning_results_test,
-            },
-            f,
+    final_savedir = gp.get_dir(gp.outputs_dir())
+    with open(final_savedir / "basic_ggnn_results.csv", "a") as f:
+        f.write(
+            ",".join(
+                [
+                    ID,
+                    json.dumps(ggnn_results_train),
+                    json.dumps(ggnn_results_val),
+                    json.dumps(ggnn_results_test),
+                    json.dumps(rlearning_results_train),
+                    json.dumps(rlearning_results_test),
+                ]
+            )
         )
