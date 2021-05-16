@@ -3,7 +3,7 @@
 #SBATCH -N 1
 #SBATCH -n 1
 #SBATCH --time=12:30:00
-#SBATCH --mem=2GB
+#SBATCH --mem=16GB
 #SBATCH --gres=gpu:1
 #SBATCH --err="gpunb.info"
 #SBATCH --output="gpunb.info"
