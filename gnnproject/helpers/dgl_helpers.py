@@ -217,3 +217,4 @@ def get_node_init_graph_features(dgl_proc_files: list, outprefix="no_ggnn", seed
         pkl.dump(val_noggnn, f)
     with open(gp.processed_dir() / "dl_models" / f"{outprefix}_test.pkl", "wb") as f:
         pkl.dump(test_noggnn, f)
+    return train_noggnn, val_noggnn, test_noggnn
