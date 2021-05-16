@@ -7,6 +7,7 @@ from glob import glob
 
 import gnnproject as gp
 import gnnproject.helpers.dgl_helpers as dglh
+import gnnproject.helpers.representation_learning as rlm
 import torch
 import torch.optim as optim
 from torch import nn
@@ -29,6 +30,7 @@ if __name__ == "__main__":
     parser.add_argument("--in_num", default=169, type=int)
     parser.add_argument("--out_num", default=200, type=int)
     parser.add_argument("--split_seed", default=0, type=int)
+    parser.add_argument("--patience", default=2, type=int)
     try:
         args = parser.parse_args()
     except:
@@ -39,6 +41,7 @@ if __name__ == "__main__":
     dgl_proc_files = glob(
         str(gp.processed_dir() / f"{args.dataset}_dgl_{args.variation}/*")
     )
+    dgl_proc_files = dgl_proc_files[:1000]
     train, val, test = dglh.train_val_test(dgl_proc_files, seed=args.split_seed)
     print(len(train), len(val), len(test))
     trainset = dglh.CustomGraphDataset(train)
@@ -119,15 +122,15 @@ if __name__ == "__main__":
             patience += 1
             gp.debug(f"No improvement. Patience: {patience}")
 
-        if patience > 50:
+        if patience > args.patience:
             gp.debug("Training Complete.")
             break
 
     # %% Evaluate scores on splits
     model.load_state_dict(torch.load(savepath))
-    gp.debug(dglh.eval_model(model, train_loader))
-    gp.debug(dglh.eval_model(model, val_loader))
-    gp.debug(dglh.eval_model(model, test_loader))
+    ggnn_results_train = dglh.eval_model(model, train_loader)
+    ggnn_results_val = dglh.eval_model(model, val_loader)
+    ggnn_results_test = dglh.eval_model(model, test_loader)
 
     # %% Get and save intermediate representations
     dl_args = {"batch_size": 128, "shuffle": False, "collate_fn": dglh.collate}
@@ -150,3 +153,23 @@ if __name__ == "__main__":
         gp.processed_dir() / "dl_models" / f"basic_ggnn_{ID}_hidden_test.pkl", "wb"
     ) as f:
         pkl.dump(test_graph_rep, f)
+
+    # %% Get representation learning results
+    rlearning_results_train, rlearning_results_test = rlm.representation_learning(
+        gp.processed_dir() / "dl_models" / f"basic_ggnn_{ID}_hidden_train.pkl",
+        gp.processed_dir() / "dl_models" / f"basic_ggnn_{ID}_hidden_test.pkl",
+    )
+
+    # %% Save results
+    final_savedir = gp.get_dir(gp.outputs_dir() / f"{args.dataset}_results")
+    with open(str(final_savedir) + str("/" + ID + ".pkl")) as f:
+        pkl.dump(
+            {
+                "ggnn_results_train": ggnn_results_train,
+                "ggnn_results_val": ggnn_results_val,
+                "ggnn_results_test": ggnn_results_test,
+                "rlearning_results_train": rlearning_results_train,
+                "rlearning_results_test": rlearning_results_test,
+            },
+            f,
+        )
