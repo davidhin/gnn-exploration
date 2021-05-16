@@ -15,4 +15,4 @@ module load Singularity
 module load CUDA/10.2.89
 
 # Start singularity instance
-singularity exec --nv main.simg python gnnproject/analysis/train_ggnn_basic.py --variation cfg
+singularity exec --nv main.simg python gnnproject/analysis/train_ggnn_basic.py --variation cdfdfg
