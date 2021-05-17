@@ -143,6 +143,8 @@ def train_val_test(
 ):
     """Split into train/val/test."""
     train, test = train_test_split(ilist, test_size=1 - train_ratio, random_state=seed)
+    if val_ratio == 0:
+        return train, test
     val, test = train_test_split(
         test, test_size=test_ratio / (test_ratio + val_ratio), random_state=seed
     )

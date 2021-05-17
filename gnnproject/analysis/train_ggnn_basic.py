@@ -171,14 +171,16 @@ if __name__ == "__main__":
     val_graph_rep = dglh.get_intermediate(model, val_loader)
     test_graph_rep = dglh.get_intermediate(model, test_loader)
 
+    # %% Resample
+    all_reps = train_graph_rep + val_graph_rep + test_graph_rep
+    train_graph_rep, test_graph_rep = dglh.train_val_test(
+        all_reps, train_ratio=0.8, val_ratio=0, test_ratio=0.2, seed=args.split_seed
+    )
+
     with open(
         gp.processed_dir() / "dl_models" / f"basic_ggnn_{ID}_hidden_train.pkl", "wb"
     ) as f:
         pkl.dump(train_graph_rep, f)
-    with open(
-        gp.processed_dir() / "dl_models" / f"basic_ggnn_{ID}_hidden_val.pkl", "wb"
-    ) as f:
-        pkl.dump(val_graph_rep, f)
     with open(
         gp.processed_dir() / "dl_models" / f"basic_ggnn_{ID}_hidden_test.pkl", "wb"
     ) as f:
