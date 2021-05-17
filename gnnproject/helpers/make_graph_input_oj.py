@@ -87,11 +87,11 @@ def cpg_to_dgl_from_filepath(
     EXAMPLE FOR DEBUGGING:
     import gnnproject as gp
     from gensim.models import Word2Vec
-    sample = "devign_ffmpeg_qemu/21396_qemu_2caa9e9d2e0f356cc244bc41ce1d3e81663f6782_1"
+    sample = "devign_ffmpeg_qemu/4779_qemu_e7d81004e486b0e80a674d164d8aec0e83fa812f_1"
     filepath = gp.processed_dir() / sample
     w2v = Word2Vec.load(str(gp.external_dir() / "w2v_models/devign"))
-    etypemap = EDGE_TYPES_CD
-    cfgonly = False
+    etypemap = EDGE_TYPES
+    cfgonly = True
     """
     try:
         nodes = pd.read_csv(filepath / "nodes.csv", sep="\t")
