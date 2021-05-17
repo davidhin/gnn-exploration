@@ -3,6 +3,7 @@ import argparse
 import datetime
 import json
 import pickle as pkl
+import sys
 from collections import Counter
 from glob import glob
 from random import randrange
@@ -33,6 +34,7 @@ if __name__ == "__main__":
     parser.add_argument("--out_num", default=200, type=int)
     parser.add_argument("--split_seed", default=randrange(5), type=int)
     parser.add_argument("--patience", default=30, type=int)
+    parser.add_argument("--noggnn", action="store_true")
     try:
         args = parser.parse_args()
     except:
@@ -43,6 +45,33 @@ if __name__ == "__main__":
     dgl_proc_files = glob(
         str(gp.processed_dir() / f"{args.dataset}_dgl_{args.variation}/*")
     )
+
+    if args.noggnn:
+        ID = datetime.datetime.now().strftime(
+            "%Y%m%d%H%M_{}".format("_".join([f"{v}" for k, v in vars(args).items()]))
+        )
+        trainset, valset, testset = dglh.get_node_init_graph_features(
+            dgl_proc_files, outprefix=f"basic_noggnn_{ID}"
+        )
+        rlearning_res_train, rlearning_res_test = rlm.representation_learning(
+            gp.processed_dir() / "dl_models" / f"basic_noggnn_{ID}_train.pkl",
+            gp.processed_dir() / "dl_models" / f"basic_noggnn_{ID}_test.pkl",
+            no_ggnn=True,
+        )
+        final_savedir = gp.get_dir(gp.outputs_dir())
+        with open(final_savedir / "basic_noggnn_results.csv", "a") as f:
+            f.write(
+                ",".join(
+                    [
+                        ID,
+                        '"' + json.dumps(rlearning_res_train).replace('"', "'") + '"',
+                        '"' + json.dumps(rlearning_res_test).replace('"', "'") + '"',
+                    ]
+                )
+                + "\n"
+            )
+        sys.exit()
+
     train, val, test = dglh.train_val_test(dgl_proc_files, seed=args.split_seed)
     print(len(train), len(val), len(test))
     trainset = dglh.CustomGraphDataset(train)

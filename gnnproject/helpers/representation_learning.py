@@ -713,7 +713,7 @@ def show_representation(
         print(np.array(expected_targets).shape)
 
 
-def representation_learning(train_pickle_path, test_pickle_path):
+def representation_learning(train_pickle_path, test_pickle_path, no_ggnn=False):
     """Run Representation Learning module from ReVeal."""
     with open(
         train_pickle_path,
@@ -730,6 +730,10 @@ def representation_learning(train_pickle_path, test_pickle_path):
         X_test, y_test = zip(*pkl.load(f))
         test_X = np.array([i[0] for i in X_test])
         test_Y = np.array(y_test)
+
+    if no_ggnn:
+        train_X = np.array(X_train)
+        test_X = np.array(X_test)
 
     print(
         train_X.shape,
