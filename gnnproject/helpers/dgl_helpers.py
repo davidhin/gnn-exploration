@@ -205,7 +205,7 @@ def get_node_init_graph_features(dgl_proc_files: list, outprefix="no_ggnn", seed
             g = pkl.load(f)
             feat = np.sum(g[0].ndata["_FEAT"].numpy(), axis=0)
             label = g[1]
-        return (feat, label)
+        return (feat, label, g[2])
 
     train, val, test = train_val_test(dgl_proc_files, seed=seed)
     train_noggnn = [sum_node_inits(i) for i in tqdm(train)]
