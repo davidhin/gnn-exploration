@@ -151,19 +151,23 @@ def train_val_test(
     return train, val, test
 
 
-def eval_model(model: nn.Module, data_loader: DataLoader):
+def eval_model(model: nn.Module, data_loader: DataLoader, loss_func):
     """Print evaluation metrics for model."""
     model.eval()
     with torch.no_grad():
         all_preds, all_targets = [], []
+        loss = []
         with tqdm(data_loader) as tepoch:
             for bg, label in tepoch:
                 output = model(bg)
+                loss.append(loss_func(output, label).detach().cpu().item())
                 predictions = output.argmax(dim=1, keepdim=True).squeeze()
                 all_preds += predictions.detach().cpu().tolist()
                 all_targets += label.detach().cpu().tolist()
         eval_str = "Validation: "
         ret = {}
+        ret["loss"] = np.mean(loss).item()
+        eval_str += f"Loss: {np.mean(loss).item()} | "
         for eval_met in zip(
             [accuracy_score, f1_score, precision_score, recall_score],
             ["acc", "f1", "prec", "rec"],
