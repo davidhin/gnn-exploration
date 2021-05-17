@@ -89,7 +89,15 @@ class RevealDevign(DGLDataset):
 class BasicGGNN(nn.Module):
     """Basic GGNN for graph classification."""
 
-    def __init__(self, in_dim, hidden_dim, n_classes, n_etypes=13):
+    def __init__(
+        self,
+        in_dim,
+        hidden_dim,
+        n_classes,
+        n_etypes=13,
+        ndata_name="_FEAT",
+        edata_name="_TYPE",
+    ):
         """Initialise."""
         super(BasicGGNN, self).__init__()
         self.ggnn = GatedGraphConv(
@@ -99,10 +107,12 @@ class BasicGGNN(nn.Module):
             n_etypes=n_etypes,
         )
         self.classify = nn.Linear(hidden_dim, n_classes)
+        self.ndata_name = ndata_name
+        self.edata_name = edata_name
 
     def forward(self, g):
         """Forward pass."""
-        h = self.ggnn(g, g.ndata["_FEAT"], g.edata["_TYPE"])
+        h = self.ggnn(g, g.ndata[self.ndata_name], g.edata[self.edata_name])
         g.ndata["h"] = h
         hg = dgl.sum_nodes(g, "h")
         return self.classify(hg)
