@@ -66,12 +66,13 @@ def embed_code(code: str, w2v: gensim.models.word2vec) -> np.array:
     code = nltk.word_tokenize(code.strip())
     if len(code) == 0:
         return np.zeros(100)
-    try:
-        return np.array(
-            sum(np.array([w2v.wv[word] for word in code])) / len(code), dtype="float32"
-        )
-    except:
-        return np.zeros(100)
+    wvecs = []
+    for word in code:
+        try:
+            wvecs.append(w2v.wv[word])
+        except:
+            wvecs.append(np.zeros(100))
+    return np.array(sum(np.array(wvecs)) / len(code), dtype="float32")
 
 
 def cpg_to_dgl_from_filepath(
