@@ -43,11 +43,11 @@ if __name__ == "__main__":
     dgl_proc_files = glob(
         str(gp.processed_dir() / f"{args.dataset}_dgl_{args.variation}/*")
     )
+    ID = datetime.datetime.now().strftime(
+        "%Y%m%d%H%M_{}".format("_".join([f"{v}" for k, v in vars(args).items()]))
+    )
 
     if args.noggnn:
-        ID = datetime.datetime.now().strftime(
-            "%Y%m%d%H%M_{}".format("_".join([f"{v}" for k, v in vars(args).items()]))
-        )
         trainset, valset, testset = dglh.get_node_init_graph_features(
             dgl_proc_files, outprefix=f"basic_noggnn_{ID}"
         )
@@ -94,9 +94,6 @@ if __name__ == "__main__":
     loss_func = nn.BCELoss()
     optimizer = optim.Adam(model.parameters(), lr=args.learn_rate, weight_decay=0.001)
     savedir = gp.get_dir(gp.processed_dir() / "dl_models")
-    ID = datetime.datetime.now().strftime(
-        "%Y%m%d%H%M_{}".format("_".join([f"{v}" for k, v in vars(args).items()]))
-    )
     savepath = savedir / f"best_basic_ggnn_{ID}.bin"
     model = model.to("cuda")
 
