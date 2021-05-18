@@ -65,4 +65,8 @@ def debug(msg, sep="\t"):
 
 def gitsha():
     """Get current git commit sha for reproducibility."""
-    return subprocess.check_output(["git", "rev-parse", "HEAD"]).strip().decode()
+    return (
+        subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
+        .strip()
+        .decode()
+    )
