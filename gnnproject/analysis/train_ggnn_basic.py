@@ -170,10 +170,10 @@ if __name__ == "__main__":
     test_graph_rep = dglh.get_intermediate(model, test_loader)
 
     # %% Resample
-    all_reps = train_graph_rep + val_graph_rep + test_graph_rep
-    train_graph_rep, test_graph_rep = dglh.train_val_test(
-        all_reps, train_ratio=0.8, val_ratio=0, test_ratio=0.2, seed=args.split_seed
-    )
+    # all_reps = train_graph_rep + val_graph_rep + test_graph_rep
+    # train_graph_rep, test_graph_rep = dglh.train_val_test(
+    #     all_reps, train_ratio=0.8, val_ratio=0, test_ratio=0.2, seed=args.split_seed
+    # )
 
     with open(
         gp.processed_dir() / "dl_models" / f"basic_ggnn_{ID}_hidden_train.pkl", "wb"
