@@ -713,7 +713,9 @@ def show_representation(
         print(np.array(expected_targets).shape)
 
 
-def representation_learning(train_pickle_path, test_pickle_path, no_ggnn=False):
+def representation_learning(
+    train_pickle_path, test_pickle_path, no_ggnn=False, lambda1=0.5, lambda2=0.001
+):
     """Run Representation Learning module from ReVeal."""
     with open(
         train_pickle_path,
@@ -746,8 +748,8 @@ def representation_learning(train_pickle_path, test_pickle_path, no_ggnn=False):
     )
 
     model = RepresentationLearningModel(
-        lambda1=0.5,
-        lambda2=0.001,
+        lambda1=lambda1,
+        lambda2=lambda2,
         batch_size=64,
         print=True,
         max_patience=5,
