@@ -25,9 +25,7 @@ if __name__ == "__main__":
         default="devign_ffmpeg_qemu",
         choices=["devign_ffmpeg_qemu"],
     )
-    parser.add_argument(
-        "--variation", default="cfgdfg", choices=["cfg", "cfgdfg", "cpg"]
-    )
+    parser.add_argument("--variation", default="cfg", choices=["cfg", "cfgdfg", "cpg"])
     parser.add_argument("--batch_size", default=64, type=int)
     parser.add_argument("--learn_rate", default=0.0001, type=float)
     parser.add_argument("--in_num", default=169, type=int)
