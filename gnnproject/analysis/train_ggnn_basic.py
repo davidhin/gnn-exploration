@@ -44,7 +44,9 @@ if __name__ == "__main__":
         str(gp.processed_dir() / f"{args.dataset}_dgl_{args.variation}/*")
     )
     ID = datetime.datetime.now().strftime(
-        "%Y%m%d%H%M_{}".format("_".join([f"{v}" for k, v in vars(args).items()]))
+        "%Y%m%d%H%M_{}_{}".format(
+            gp.gitsha(), "_".join([f"{v}" for k, v in vars(args).items()])
+        )
     )
 
     if args.noggnn:
