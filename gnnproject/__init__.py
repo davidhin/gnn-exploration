@@ -1,5 +1,6 @@
 """Set up project paths."""
 import inspect
+import subprocess
 from datetime import datetime
 from pathlib import Path
 
@@ -60,3 +61,8 @@ def debug(msg, sep="\t"):
             time, file_name, ln, msg
         )
     )
+
+
+def gitsha():
+    """Get current git commit sha for reproducibility."""
+    return subprocess.check_output(["git", "rev-parse", "HEAD"]).strip().decode()
