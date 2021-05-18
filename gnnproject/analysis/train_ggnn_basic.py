@@ -106,7 +106,7 @@ if __name__ == "__main__":
     # %% Train DL model
     model.train()
     epoch_losses = []
-    best_val_loss = 99999
+    best_score = 0
     patience = 0
     for epoch in range(500):
         epoch_loss = 0
@@ -141,8 +141,8 @@ if __name__ == "__main__":
         for s in scores.items():
             writer.add_scalar(s[0], s[1], epoch * len(train_loader) + iter)
 
-        if scores["loss"] < best_val_loss:
-            best_val_loss = scores["loss"]
+        if scores["f1"] > best_score:
+            best_score = scores["f1"]
             with open(savepath, "wb") as f:
                 torch.save(model.state_dict(), f)
             gp.debug(f"Best model saved. {scores} Patience: {patience}")
