@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import torch
+import torch.nn.functional as F
 from dgl.data import DGLDataset
 from dgl.nn import GatedGraphConv
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
@@ -112,6 +113,7 @@ class BasicGGNN(nn.Module):
     def forward(self, g):
         """Forward pass."""
         h = self.ggnn(g, g.ndata[self.ndata_name], g.edata[self.edata_name])
+        h = F.relu(h)
         g.ndata["h"] = h
         hg = dgl.sum_nodes(g, "h")
         linearout = self.classify(hg)
