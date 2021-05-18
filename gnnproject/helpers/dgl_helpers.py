@@ -93,7 +93,6 @@ class BasicGGNN(nn.Module):
         self,
         in_dim,
         hidden_dim,
-        n_classes,
         n_etypes=13,
         ndata_name="_FEAT",
         edata_name="_TYPE",
@@ -106,7 +105,7 @@ class BasicGGNN(nn.Module):
             n_steps=6,
             n_etypes=n_etypes,
         )
-        self.classify = nn.Linear(hidden_dim, n_classes)
+        self.classify = nn.Linear(hidden_dim, 1)
         self.ndata_name = ndata_name
         self.edata_name = edata_name
 
@@ -115,7 +114,8 @@ class BasicGGNN(nn.Module):
         h = self.ggnn(g, g.ndata[self.ndata_name], g.edata[self.edata_name])
         g.ndata["h"] = h
         hg = dgl.sum_nodes(g, "h")
-        return self.classify(hg)
+        linearout = self.classify(hg)
+        return torch.sigmoid(linearout).squeeze(dim=-1)
 
 
 def collate(samples, device="cuda"):
@@ -151,7 +151,9 @@ def train_val_test(
     return train, val, test
 
 
-def eval_model(model: nn.Module, data_loader: DataLoader, loss_func):
+def eval_model(
+    model: nn.Module, data_loader: DataLoader, loss_func, labels_to_float32: bool
+):
     """Print evaluation metrics for model."""
     model.eval()
     with torch.no_grad():
@@ -160,14 +162,16 @@ def eval_model(model: nn.Module, data_loader: DataLoader, loss_func):
         with tqdm(data_loader) as tepoch:
             for bg, label in tepoch:
                 output = model(bg)
+                if labels_to_float32:
+                    label = label.to(torch.float32)
                 loss.append(loss_func(output, label).detach().cpu().item())
-                predictions = output.argmax(dim=1, keepdim=True).squeeze()
+                predictions = (output > 0.5).float()
                 all_preds += predictions.detach().cpu().tolist()
                 all_targets += label.detach().cpu().tolist()
         eval_str = "Validation: "
         ret = {}
         ret["loss"] = np.mean(loss).item()
-        eval_str += f"Loss: {np.mean(loss).item()} | "
+        eval_str += f"Loss: {round(np.mean(loss).item(), 4)} | "
         for eval_met in zip(
             [accuracy_score, f1_score, precision_score, recall_score],
             ["acc", "f1", "prec", "rec"],

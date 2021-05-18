@@ -90,8 +90,8 @@ if __name__ == "__main__":
     test_loader = DataLoader(testset, **dl_args)
 
     # %% Get DL model
-    model = dglh.BasicGGNN(args.in_num, args.out_num, 2)
-    loss_func = nn.CrossEntropyLoss()
+    model = dglh.BasicGGNN(args.in_num, args.out_num)
+    loss_func = nn.BCELoss()
     optimizer = optim.Adam(model.parameters(), lr=args.learn_rate, weight_decay=0.001)
     savedir = gp.get_dir(gp.processed_dir() / "dl_models")
     ID = datetime.datetime.now().strftime(
@@ -121,7 +121,7 @@ if __name__ == "__main__":
 
                 output = model(bg)
 
-                loss = loss_func(output, label)
+                loss = loss_func(output, label.to(torch.float32))
                 tepoch.set_postfix(loss=loss.item())
                 epoch_loss += loss.detach().item()
 
@@ -136,7 +136,8 @@ if __name__ == "__main__":
                 "Epoch Loss", epoch_loss, epoch * len(train_loader) + iter
             )
 
-        scores = dglh.eval_model(model, val_loader, loss_func)
+        scores = dglh.eval_model(model, val_loader, loss_func, True)
+        writer.add_scalar("Val Loss", scores["loss"], epoch * len(train_loader) + iter)
         for s in scores.items():
             writer.add_scalar(s[0], s[1], epoch * len(train_loader) + iter)
 
@@ -156,9 +157,9 @@ if __name__ == "__main__":
 
     # %% Evaluate scores on splits
     model.load_state_dict(torch.load(savepath))
-    ggnn_results_train = dglh.eval_model(model, train_loader, loss_func)
-    ggnn_results_val = dglh.eval_model(model, val_loader, loss_func)
-    ggnn_results_test = dglh.eval_model(model, test_loader, loss_func)
+    ggnn_results_train = dglh.eval_model(model, train_loader, loss_func, True)
+    ggnn_results_val = dglh.eval_model(model, val_loader, loss_func, True)
+    ggnn_results_test = dglh.eval_model(model, test_loader, loss_func, True)
 
     # %% Get and save intermediate representations
     dl_args = {"batch_size": 128, "shuffle": False, "collate_fn": dglh.collate}
