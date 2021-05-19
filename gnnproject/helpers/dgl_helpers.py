@@ -154,7 +154,11 @@ def train_val_test(
 
 
 def eval_model(
-    model: nn.Module, data_loader: DataLoader, loss_func, labels_to_float32: bool
+    model: nn.Module,
+    data_loader: DataLoader,
+    loss_func,
+    labels_to_float32: bool,
+    verbose=0,
 ):
     """Print evaluation metrics for model."""
     model.eval()
@@ -183,6 +187,9 @@ def eval_model(
             ret[eval_met[1]] = score
         print("")
         gp.debug(eval_str)
+        if verbose > 1:
+            gp.debug(all_preds[:50])
+            gp.debug(all_targets[:50])
     model.train()
     return ret
 
