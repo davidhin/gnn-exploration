@@ -125,7 +125,14 @@ if __name__ == "__main__":
 
     # %% Train model
     dglh.train(
-        model, train_loader, val_loader, loss_func, optimizer, savepath, writer, args
+        model=model,
+        train_loader=train_loader,
+        val_loader=val_loader,
+        loss_func=loss_func,
+        optimizer=optimizer,
+        savepath=savepath,
+        writer=writer,
+        args=args,
     )
     torch.cuda.empty_cache()
 
@@ -136,10 +143,6 @@ if __name__ == "__main__":
     ggnn_results_test = dglh.eval_model(model, test_loader, loss_func, True)
 
     # %% Get and save intermediate representations
-    dl_args = {"batch_size": 128, "shuffle": False, "collate_fn": dglh.collate}
-    train_loader = DataLoader(trainset, **dl_args)
-    val_loader = DataLoader(valset, **dl_args)
-    test_loader = DataLoader(testset, **dl_args)
     train_graph_rep = dglh.get_intermediate(model, train_loader)
     val_graph_rep = dglh.get_intermediate(model, val_loader)
     test_graph_rep = dglh.get_intermediate(model, test_loader)
