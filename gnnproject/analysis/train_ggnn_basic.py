@@ -35,7 +35,7 @@ if __name__ == "__main__":
     parser.add_argument("--split_seed", default=randrange(5), type=int)
     parser.add_argument("--patience", default=30, type=int)
     parser.add_argument("--noggnn", action="store_true")
-    parser.add_argument("--model", default="devign", choices=["devign", "ggnnsum"])
+    parser.add_argument("--model", default="ggnnsum", choices=["devign", "ggnnsum"])
     try:
         args = parser.parse_args()
     except:
