@@ -178,7 +178,7 @@ def eval_model(
             [accuracy_score, f1_score, precision_score, recall_score],
             ["acc", "f1", "prec", "rec"],
         ):
-            score = round(eval_met[0](all_preds, all_targets), 4)
+            score = round(eval_met[0](all_targets, all_preds), 4)
             eval_str += f"{eval_met[1]}: {score} | "
             ret[eval_met[1]] = score
         print("")
