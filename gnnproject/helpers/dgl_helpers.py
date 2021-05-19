@@ -120,6 +120,15 @@ class BasicGGNN(nn.Module):
         linearout = self.classify(hg)
         return torch.sigmoid(linearout).squeeze(dim=-1)
 
+    def get_graph_embeddings(self, g):
+        """Get graph embedding for a batched graph."""
+        h = self.ggnn(g, g.ndata[self.ndata_name], g.edata[self.edata_name])
+        g.ndata["h"] = h
+        embeddings = []
+        for gi in dgl.unbatch(g):
+            embeddings.append(dgl.sum_nodes(gi, "h").detach().cpu().numpy())
+        return embeddings
+
 
 def unbatch_graph_to_tensor(g, ndata_name: str):
     """Given a batched graph, unbatch and return a tensor.
