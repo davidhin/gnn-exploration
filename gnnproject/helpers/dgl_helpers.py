@@ -318,3 +318,66 @@ def get_node_init_graph_features(dgl_proc_files: list, outprefix="no_ggnn", seed
     with open(gp.processed_dir() / "dl_models" / f"{outprefix}_test.pkl", "wb") as f:
         pkl.dump(test_noggnn, f)
     return train_noggnn, val_noggnn, test_noggnn
+
+
+def train(
+    model: nn.Module,
+    train_loader: DataLoader,
+    val_loader: DataLoader,
+    loss_func,
+    optimizer,
+    savepath: str,
+    writer,
+    args,
+):
+    """Train DL model."""
+    model.train()
+    epoch_losses = []
+    best_score = 0
+    patience = 0
+    for epoch in range(500):
+        epoch_loss = 0
+        with tqdm(train_loader) as tepoch:
+            for iter, (bg, label) in enumerate(tepoch):
+                if len(epoch_losses) > 0:
+                    tepoch.set_description(
+                        f"Epoch {epoch} (loss: {round(epoch_losses[-1], 4)})"
+                    )
+                else:
+                    tepoch.set_description(f"Epoch {epoch}")
+
+                output = model(bg)
+
+                loss = loss_func(output, label.to(torch.float32))
+                tepoch.set_postfix(loss=loss.item())
+                epoch_loss += loss.detach().item()
+
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+
+            # ...log the running loss
+            epoch_loss /= iter + 1
+            epoch_losses.append(epoch_loss)
+            writer.add_scalar(
+                "Epoch Loss", epoch_loss, epoch * len(train_loader) + iter
+            )
+
+        scores = eval_model(model, val_loader, loss_func, True)
+        writer.add_scalar("Val Loss", scores["loss"], epoch * len(train_loader) + iter)
+        for s in scores.items():
+            writer.add_scalar(s[0], s[1], epoch * len(train_loader) + iter)
+
+        if scores["f1"] > best_score:
+            best_score = scores["f1"]
+            with open(savepath, "wb") as f:
+                torch.save(model.state_dict(), f)
+            gp.debug(f"Best model saved. {scores} Patience: {patience}")
+            patience = 0
+        else:
+            patience += 1
+            gp.debug(f"No improvement. Patience: {patience}")
+
+        if patience > args.patience:
+            gp.debug("Training Complete.")
+            break
