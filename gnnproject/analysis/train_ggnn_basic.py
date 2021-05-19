@@ -2,6 +2,7 @@
 import argparse
 import datetime
 import json
+import os
 import pickle as pkl
 import sys
 from collections import Counter
@@ -73,10 +74,26 @@ if __name__ == "__main__":
         sys.exit()
 
     train, val, test = dglh.train_val_test(dgl_proc_files, seed=args.split_seed)
-    print(len(train), len(val), len(test))
-    trainset = dglh.CustomGraphDataset(train)
-    valset = dglh.CustomGraphDataset(val)
-    testset = dglh.CustomGraphDataset(test)
+
+    # Load dataset
+    cachedir = gp.get_dir(gp.interim_dir() / "cache")
+    cachefile = cachedir / f"{args.dataset}_{args.variation}_{args.split_seed}.pkl"
+    if os.path.exists(cachefile):
+        try:
+            gp.debug(f"Reading Cached result: {cachefile}")
+            with open(cachefile, "rb") as f:
+                trainset, valset, testset = pkl.load(f)
+        except Exception as E:
+            gp.debug(f"{E}: Probably because cache is currently being written to.")
+            trainset = dglh.CustomGraphDataset(train)
+            valset = dglh.CustomGraphDataset(val)
+            testset = dglh.CustomGraphDataset(test)
+    else:
+        trainset = dglh.CustomGraphDataset(train)
+        valset = dglh.CustomGraphDataset(val)
+        testset = dglh.CustomGraphDataset(test)
+        with open(cachefile, "wb") as f:
+            pkl.dump([trainset, valset, testset], f)
     gp.debug(Counter([int(i) for i in trainset.labels]))
     gp.debug(Counter([int(i) for i in valset.labels]))
     gp.debug(Counter([int(i) for i in testset.labels]))
