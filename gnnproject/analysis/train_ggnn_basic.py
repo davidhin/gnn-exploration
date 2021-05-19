@@ -34,6 +34,7 @@ if __name__ == "__main__":
     parser.add_argument("--split_seed", default=randrange(5), type=int)
     parser.add_argument("--patience", default=30, type=int)
     parser.add_argument("--noggnn", action="store_true")
+    parser.add_argument("--model", default="devign", choices=["devign", "ggnnsum"])
     try:
         args = parser.parse_args()
     except:
@@ -109,7 +110,10 @@ if __name__ == "__main__":
     test_loader = DataLoader(testset, **dl_args)
 
     # %% Get DL model
-    model = dglh.BasicGGNN(args.in_num, args.out_num)
+    if args.model == "ggnnsum":
+        model = dglh.BasicGGNN(args.in_num, args.out_num)
+    if args.model == "devign":
+        model = dglh.DevignGGNN(args.in_num, args.out_num)
     loss_func = nn.BCELoss()
     optimizer = optim.Adam(model.parameters(), lr=args.learn_rate, weight_decay=0.001)
     savedir = gp.get_dir(gp.processed_dir() / "dl_models")

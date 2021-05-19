@@ -13,6 +13,7 @@ from dgl.nn import GatedGraphConv
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from sklearn.model_selection import train_test_split
 from torch import nn
+from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
@@ -118,6 +119,76 @@ class BasicGGNN(nn.Module):
         hg = dgl.sum_nodes(g, "h")
         linearout = self.classify(hg)
         return torch.sigmoid(linearout).squeeze(dim=-1)
+
+
+def unbatch_graph_to_tensor(g, ndata_name: str):
+    """Given a batched graph, unbatch and return a tensor.
+
+    Output tensor is of shape: (BATCH_SIZE, FEATURE_SIZE, NUM_NODES)
+    """
+    graphs = dgl.unbatch(g)
+    batch_input = pad_sequence([g.ndata[ndata_name] for g in graphs])
+    batch_input = batch_input.transpose(0, 1).transpose(1, 2)
+    return batch_input
+
+
+class DevignGGNN(nn.Module):
+    """Basic GGNN for graph classification."""
+
+    def __init__(
+        self,
+        in_dim,
+        hidden_dim,
+        n_etypes=13,
+        ndata_name="_FEAT",
+        edata_name="_TYPE",
+    ):
+        """Initialise."""
+        super(DevignGGNN, self).__init__()
+        self.ggnn = GatedGraphConv(
+            in_feats=in_dim,
+            out_feats=hidden_dim,
+            n_steps=6,
+            n_etypes=n_etypes,
+        )
+        self.ndata_name = ndata_name
+        self.edata_name = edata_name
+
+        self.conv_l1 = torch.nn.Conv1d(hidden_dim, hidden_dim, 3)
+        self.maxpool1 = torch.nn.MaxPool1d(3, stride=2)
+        self.conv_l2 = torch.nn.Conv1d(hidden_dim, hidden_dim, 1)
+        self.maxpool2 = torch.nn.MaxPool1d(2, stride=2)
+
+        self.concat_dim = in_dim + hidden_dim
+        self.conv_l1_for_concat = torch.nn.Conv1d(self.concat_dim, self.concat_dim, 3)
+        self.maxpool1_for_concat = torch.nn.MaxPool1d(3, stride=2)
+        self.conv_l2_for_concat = torch.nn.Conv1d(self.concat_dim, self.concat_dim, 1)
+        self.maxpool2_for_concat = torch.nn.MaxPool1d(2, stride=2)
+
+        self.mlp_z = nn.Linear(in_features=self.concat_dim, out_features=1)
+        self.mlp_y = nn.Linear(in_features=hidden_dim, out_features=1)
+
+    def forward(self, g):
+        """Forward pass."""
+        x = g.ndata[self.ndata_name]
+        h = self.ggnn(g, x, g.edata[self.edata_name])
+        g.ndata["h"] = h
+        g.ndata["c"] = torch.cat((h, x), dim=-1)
+
+        batched_h = unbatch_graph_to_tensor(g, "h")
+        Y_1 = self.maxpool1(F.relu(self.conv_l1(batched_h)))
+        Y_2 = self.maxpool2(F.relu(self.conv_l2(Y_1)))
+        Y_2 = Y_2.transpose(1, 2)
+
+        batched_c = unbatch_graph_to_tensor(g, "c")
+        Z_1 = self.maxpool1_for_concat(F.relu(self.conv_l1_for_concat(batched_c)))
+        Z_2 = self.maxpool2_for_concat(F.relu(self.conv_l2_for_concat(Z_1)))
+        Z_2 = Z_2.transpose(1, 2)
+
+        before_avg = torch.mul(self.mlp_y(Y_2), self.mlp_z(Z_2))
+        avg = before_avg.mean(dim=1)
+        result = torch.sigmoid(avg).squeeze(dim=-1)
+        return result
 
 
 def collate(samples, device="cuda"):
