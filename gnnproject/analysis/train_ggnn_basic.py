@@ -74,7 +74,13 @@ if __name__ == "__main__":
             )
         sys.exit()
 
+    # %% Save splits
     train, val, test = dglh.train_val_test(dgl_proc_files, seed=args.split_seed)
+    records = []
+    for s, n in [("train", train), ("val", val), ("test", test)]:
+        records += [{"set": s, "file": Path(i).stem} for i in n]
+    splitdir = gp.get_dir(gp.processed_dir() / "dl_models" / "splits")
+    pd.DataFrame.from_records(records).to_csv(splitdir / f"{ID}.csv", index=0)
 
     # Load dataset
     cachedir = gp.get_dir(gp.interim_dir() / "cache")
