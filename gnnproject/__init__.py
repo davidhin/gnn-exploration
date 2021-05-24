@@ -70,3 +70,21 @@ def gitsha():
         .strip()
         .decode()
     )
+
+
+def subprocess_cmd(command: str, verbose: int = 0):
+    """Run command line process.
+
+    Example:
+    subprocess_cmd('echo a; echo b', verbose=1)
+    >>> a
+    >>> b
+    """
+    process = subprocess.Popen(
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+    )
+    output = process.communicate()
+    if verbose > 1:
+        debug(output[0].decode())
+        debug(output[1].decode())
+    return output
